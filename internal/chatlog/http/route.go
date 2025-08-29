@@ -89,6 +89,10 @@ func (s *Service) GetChatlog(c *gin.Context) {
 	}
 
 	var err error
+	// 如果 q.Time 为空，则设置为 "all"
+	if q.Time == "" {
+		q.Time = "all"
+	}
 	start, end, ok := util.TimeRangeOf(q.Time)
 	if !ok {
 		errors.Err(c, errors.InvalidArg("time"))
@@ -222,11 +226,12 @@ func (s *Service) GetChatRooms(c *gin.Context) {
 func (s *Service) GetSessions(c *gin.Context) {
 
 	q := struct {
-		Keyword        string `form:"keyword"`
-		Limit          int    `form:"limit"`
-		Offset         int    `form:"offset"`
-		Format         string `form:"format"`
-		HasUnreadCount int    `form:"HasUnreadCount"`
+		Keyword         string `form:"keyword"`
+		Limit           int    `form:"limit"`
+		Offset          int    `form:"offset"`
+		Format          string `form:"format"`
+		IgnoreUsernames string `form:"IgnoreUsernames"`
+		HasUnreadCount  int    `form:"HasUnreadCount"`
 	}{}
 
 	if err := c.BindQuery(&q); err != nil {
@@ -234,7 +239,7 @@ func (s *Service) GetSessions(c *gin.Context) {
 		return
 	}
 
-	sessions, err := s.db.GetSessions(q.Keyword, q.Limit, q.Offset, q.HasUnreadCount)
+	sessions, err := s.db.GetSessions(q.Keyword, q.Limit, q.Offset, q.HasUnreadCount, q.IgnoreUsernames)
 	if err != nil {
 		errors.Err(c, err)
 		return

@@ -107,11 +107,11 @@ type GetSessionsResp struct {
 	Items []*model.Session `json:"items"`
 }
 
-func (w *DB) GetSessions(key string, limit, offset int, HasUnreadCount int) (*GetSessionsResp, error) {
+func (w *DB) GetSessions(key string, limit, offset int, HasUnreadCount int, IgnoreUsernames string) (*GetSessionsResp, error) {
 	ctx := context.Background()
 
 	// 使用 repository 获取会话列表
-	sessions, err := w.repo.GetSessions(ctx, key, limit, offset, HasUnreadCount)
+	sessions, err := w.repo.GetSessions(ctx, key, limit, offset, HasUnreadCount, IgnoreUsernames)
 	if err != nil {
 		return nil, err
 	}

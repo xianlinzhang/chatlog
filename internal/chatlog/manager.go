@@ -254,7 +254,7 @@ func (m *Manager) RefreshSession() error {
 			return err
 		}
 	}
-	resp, err := m.db.GetSessions("", 1, 0, 0)
+	resp, err := m.db.GetSessions("", 1, 0, 0, "")
 	if err != nil {
 		return err
 	}

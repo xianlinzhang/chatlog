@@ -53,8 +53,8 @@ func (s *Service) GetChatRooms(key string, limit, offset int) (*wechatdb.GetChat
 }
 
 // GetSession retrieves session information
-func (s *Service) GetSessions(key string, limit, offset int, HasUnreadCount int) (*wechatdb.GetSessionsResp, error) {
-	return s.db.GetSessions(key, limit, offset, HasUnreadCount)
+func (s *Service) GetSessions(key string, limit, offset int, HasUnreadCount int, IgnoreUsernames string) (*wechatdb.GetSessionsResp, error) {
+	return s.db.GetSessions(key, limit, offset, HasUnreadCount, IgnoreUsernames)
 }
 
 func (s *Service) GetMedia(_type string, key string) (*model.Media, error) {

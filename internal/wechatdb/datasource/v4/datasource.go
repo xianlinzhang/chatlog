@@ -539,13 +539,14 @@ func (ds *DataSource) GetChatRooms(ctx context.Context, key string, limit, offse
 }
 
 // 最近会话
-func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset int, HasUnreadCount int) ([]*model.Session, error) {
+func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset int, HasUnreadCount int, IgnoreUsernames string) ([]*model.Session, error) {
 	var query string
 	var args []interface{}
 
+	log.Info().Str("key", key).Str("limit", fmt.Sprintf("%d", limit)).Str("offset", fmt.Sprintf("%d", offset)).Str("HasUnreadCount", fmt.Sprintf("%d", HasUnreadCount)).Str("IgnoreUsernames", IgnoreUsernames)
+
 	// 基础查询字段
-	baseQuery := `SELECT username, summary, last_timestamp, last_msg_sender, last_sender_display_name, unread_count 
-				FROM SessionTable`
+	baseQuery := `SELECT username, summary, last_timestamp, last_msg_sender, last_sender_display_name, unread_count FROM SessionTable`
 
 	// 构建WHERE条件
 	var conditions []string
@@ -554,6 +555,18 @@ func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset
 	if key != "" {
 		conditions = append(conditions, "(username = ? OR last_sender_display_name = ?)")
 		args = append(args, key, key)
+	}
+
+	if IgnoreUsernames != "" {
+		usernames := strings.Split(IgnoreUsernames, ",")
+		if len(usernames) > 0 {
+			placeholders := make([]string, len(usernames))
+			for i, username := range usernames {
+				placeholders[i] = "?"
+				args = append(args, username)
+			}
+			conditions = append(conditions, "username NOT IN ("+strings.Join(placeholders, ",")+")")
+		}
 	}
 
 	// 未读消息筛选条件

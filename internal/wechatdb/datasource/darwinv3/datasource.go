@@ -523,7 +523,7 @@ func (ds *DataSource) GetChatRooms(ctx context.Context, key string, limit, offse
 }
 
 // GetSessions 实现获取会话信息的方法
-func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset int, HasUnreadCount int) ([]*model.Session, error) {
+func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset int, HasUnreadCount int, IgnoreUsernames string) ([]*model.Session, error) {
 	var query string
 	var args []interface{}
 

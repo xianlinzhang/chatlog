@@ -25,7 +25,7 @@ type DataSource interface {
 	GetChatRooms(ctx context.Context, key string, limit, offset int) ([]*model.ChatRoom, error)
 
 	// 最近会话
-	GetSessions(ctx context.Context, key string, limit, offset int, HasUnreadCount int) ([]*model.Session, error)
+	GetSessions(ctx context.Context, key string, limit, offset int, HasUnreadCount int, IgnoreUsernames string) ([]*model.Session, error)
 
 	// 媒体
 	GetMedia(ctx context.Context, _type string, key string) (*model.Media, error)

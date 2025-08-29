@@ -374,6 +374,16 @@
                 <option value="0">仅搜索不存在存在未读消息</option>
               </select>
             </div>
+            <div class="form-group">
+              <label for="ignore-usernames"
+              >忽略用户（多个用户用英文逗号分隔）：<span class="optional-param">可选</span></label
+              >
+              <input
+                      type="text"
+                      id="ignore-usernames"
+                      placeholder="输入username"
+              />
+            </div>
           </div>
 
           <!-- 群聊查询表单 -->
@@ -457,23 +467,23 @@
               </p>
             </div>
             <div class="form-group">
+              <label for="talker"
+              >聊天对象：<span class="required-field">*</span></label
+              >
+              <input
+                      type="text"
+                      id="talker"
+                      placeholder="wxid、群ID、备注名或昵称"
+              />
+            </div>
+            <div class="form-group">
               <label for="time"
-                >时间范围：<span class="required-field">*</span></label
+                >时间范围：<!--<span class="required-field">*</span>--></label
               >
               <input
                 type="text"
                 id="time"
                 placeholder="例如：2023-01-01 或 2023-01-01~2023-01-31"
-              />
-            </div>
-            <div class="form-group">
-              <label for="talker"
-                >聊天对象：<span class="required-field">*</span></label
-              >
-              <input
-                type="text"
-                id="talker"
-                placeholder="wxid、群ID、备注名或昵称"
               />
             </div>
             <div class="form-group">
@@ -647,7 +657,7 @@
                 const format = document.getElementById("format").value;
 
                 // 验证必填项
-                if (!time || !talker) {
+                if (!talker) {
                   errorMessage.textContent =
                     "错误: 时间范围和聊天对象为必填项！";
                   errorMessage.style.display = "block";
@@ -694,12 +704,16 @@
 
                 const HasUnreadCount =
                   document.getElementById("HasUnreadCount").value;
+                const IgnoreUsernames =
+                  document.getElementById("ignore-usernames").value;
                 const sessionFormat =
                   document.getElementById("session-format").value;
 
                 if (sessionFormat) params.append("format", sessionFormat);
 
                 if (HasUnreadCount) params.append("HasUnreadCount", HasUnreadCount);
+
+                if (IgnoreUsernames) params.append("IgnoreUsernames", IgnoreUsernames);
                 break;
             }
 
