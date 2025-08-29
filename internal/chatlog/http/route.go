@@ -3,18 +3,17 @@ package http
 import (
 	"embed"
 	"fmt"
+	"github.com/rs/zerolog/log"
 	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/sjzar/chatlog/internal/errors"
 	"github.com/sjzar/chatlog/pkg/util"
 	"github.com/sjzar/chatlog/pkg/util/dat2img"
-	"github.com/sjzar/chatlog/pkg/util/silk"
-
-	"github.com/gin-gonic/gin"
 )
 
 // EFS holds embedded file system data for static assets.
@@ -131,10 +130,11 @@ func (s *Service) GetChatlog(c *gin.Context) {
 func (s *Service) GetContacts(c *gin.Context) {
 
 	q := struct {
-		Keyword string `form:"keyword"`
-		Limit   int    `form:"limit"`
-		Offset  int    `form:"offset"`
-		Format  string `form:"format"`
+		Keyword  string `form:"keyword"`
+		Limit    int    `form:"limit"`
+		Offset   int    `form:"offset"`
+		Format   string `form:"format"`
+		IsFriend int    `form:"isFriend"`
 	}{}
 
 	if err := c.BindQuery(&q); err != nil {
@@ -142,7 +142,9 @@ func (s *Service) GetContacts(c *gin.Context) {
 		return
 	}
 
-	list, err := s.db.GetContacts(q.Keyword, q.Limit, q.Offset)
+	log.Info().Interface("q", q).Msg("GetContacts query")
+
+	list, err := s.db.GetContacts(q.Keyword, q.Limit, q.Offset, q.IsFriend)
 	if err != nil {
 		errors.Err(c, err)
 		return
@@ -220,10 +222,11 @@ func (s *Service) GetChatRooms(c *gin.Context) {
 func (s *Service) GetSessions(c *gin.Context) {
 
 	q := struct {
-		Keyword string `form:"keyword"`
-		Limit   int    `form:"limit"`
-		Offset  int    `form:"offset"`
-		Format  string `form:"format"`
+		Keyword        string `form:"keyword"`
+		Limit          int    `form:"limit"`
+		Offset         int    `form:"offset"`
+		Format         string `form:"format"`
+		HasUnreadCount int    `form:"HasUnreadCount"`
 	}{}
 
 	if err := c.BindQuery(&q); err != nil {
@@ -231,7 +234,7 @@ func (s *Service) GetSessions(c *gin.Context) {
 		return
 	}
 
-	sessions, err := s.db.GetSessions(q.Keyword, q.Limit, q.Offset)
+	sessions, err := s.db.GetSessions(q.Keyword, q.Limit, q.Offset, q.HasUnreadCount)
 	if err != nil {
 		errors.Err(c, err)
 		return
@@ -379,11 +382,16 @@ func (s *Service) HandleDatFile(c *gin.Context, path string) {
 	}
 }
 
+//func (s *Service) HandleVoice(c *gin.Context, data []byte) {
+//	out, err := silk.Silk2MP3(data)
+//	if err != nil {
+//		c.Data(http.StatusOK, "audio/silk", data)
+//		return
+//	}
+//	c.Data(http.StatusOK, "audio/mp3", out)
+//}
+
 func (s *Service) HandleVoice(c *gin.Context, data []byte) {
-	out, err := silk.Silk2MP3(data)
-	if err != nil {
-		c.Data(http.StatusOK, "audio/silk", data)
-		return
-	}
-	c.Data(http.StatusOK, "audio/mp3", out)
+	// 直接返回原始 SILK 数据，不进行转码
+	c.Data(http.StatusOK, "audio/silk", data)
 }

@@ -3,6 +3,7 @@ module github.com/sjzar/chatlog
 go 1.24.0
 
 require (
+	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gdamore/tcell/v2 v2.8.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
@@ -13,13 +14,12 @@ require (
 	github.com/rs/zerolog v1.34.0
 	github.com/shirou/gopsutil/v4 v4.25.3
 	github.com/sirupsen/logrus v1.9.3
-	github.com/sjzar/go-lame v0.0.8
-	github.com/sjzar/go-silk v0.0.1
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	golang.org/x/crypto v0.37.0
 	golang.org/x/sys v0.32.0
 	google.golang.org/protobuf v1.36.6
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	howett.net/plist v1.0.1
 )
 
@@ -28,7 +28,6 @@ require (
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
 	github.com/ebitengine/purego v0.8.2 // indirect
-	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/gdamore/encoding v1.0.1 // indirect
 	github.com/gin-contrib/sse v1.1.0 // indirect

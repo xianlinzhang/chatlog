@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"github.com/rs/zerolog/log"
 	"sort"
 	"strings"
 
@@ -98,39 +99,46 @@ func (r *Repository) GetContact(ctx context.Context, key string) (*model.Contact
 	return contact, nil
 }
 
-func (r *Repository) GetContacts(ctx context.Context, key string, limit, offset int) ([]*model.Contact, error) {
+func (r *Repository) GetContacts(ctx context.Context, key string, limit, offset int, isFriend int) ([]*model.Contact, error) {
 	ret := make([]*model.Contact, 0)
 	if key != "" {
 		ret = r.findContacts(key)
 		if len(ret) == 0 {
 			return []*model.Contact{}, nil
 		}
-		if limit > 0 {
-			end := offset + limit
-			if end > len(ret) {
-				end = len(ret)
-			}
-			if offset >= len(ret) {
-				return []*model.Contact{}, nil
-			}
-			return ret[offset:end], nil
-		}
 	} else {
 		list := r.contactList
-		if limit > 0 {
-			end := offset + limit
-			if end > len(list) {
-				end = len(list)
-			}
-			if offset >= len(list) {
-				return []*model.Contact{}, nil
-			}
-			list = list[offset:end]
-		}
 		for _, name := range list {
 			ret = append(ret, r.contactCache[name])
 		}
 	}
+
+	// 根据 isFriend 参数筛选联系人
+	if isFriend > 0 {
+		filtered := make([]*model.Contact, 0)
+		for _, contact := range ret {
+			if contact.IsFriend == true {
+				filtered = append(filtered, contact)
+			}
+		}
+		ret = filtered
+	}
+
+	// 记录查询参数到日志
+	log.Info().Str("key", key).Int("limit", limit).Int("offset", offset).Int("isFriend", isFriend).Int("initial_count", len(ret)).Msg("GetContacts: initial query")
+
+	// 处理分页
+	if limit > 0 {
+		end := offset + limit
+		if end > len(ret) {
+			end = len(ret)
+		}
+		if offset >= len(ret) {
+			return []*model.Contact{}, nil
+		}
+		return ret[offset:end], nil
+	}
+
 	return ret, nil
 }
 

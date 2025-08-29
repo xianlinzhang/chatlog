@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  go-dev:
+    build:
+      context: .
+      target: builder
+    image: my-go-dev:1.24.3
+    container_name: go-dev-container
+    volumes:
+      - .:/app
+    ports:
+      - "8070:8080"
+      - "40000:40000"
+    environment:
+      - GOPROXY=https://goproxy.cn,direct
+    # 修复命令语法 - 使用数组格式确保正确解析参数
+    command:
+      - "air"
+      - "-c"
+      - ".air.toml"
+      - "--"
+      - "-tags=composer"

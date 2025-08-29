@@ -6,11 +6,12 @@ import (
 )
 
 type Session struct {
-	UserName string    `json:"userName"`
-	NOrder   int       `json:"nOrder"`
-	NickName string    `json:"nickName"`
-	Content  string    `json:"content"`
-	NTime    time.Time `json:"nTime"`
+	UserName    string    `json:"userName"`
+	NOrder      int       `json:"nOrder"`
+	NickName    string    `json:"nickName"`
+	Content     string    `json:"content"`
+	NTime       time.Time `json:"nTime"`
+	UnreadCount int       `json:"UnreadCount"`
 }
 
 // CREATE TABLE Session(

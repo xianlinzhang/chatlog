@@ -16,6 +16,7 @@ func init() {
 }
 
 func Execute() {
+	log.Info().Msg("rootCmd command begin execution")
 	if err := rootCmd.Execute(); err != nil {
 		log.Err(err).Msg("command execution failed")
 	}
@@ -36,6 +37,7 @@ var rootCmd = &cobra.Command{
 
 func Root(cmd *cobra.Command, args []string) {
 
+	log.Info().Msg("rootCmd command is executing")
 	m, err := chatlog.New("")
 	if err != nil {
 		log.Err(err).Msg("failed to create chatlog instance")
@@ -45,4 +47,6 @@ func Root(cmd *cobra.Command, args []string) {
 	if err := m.Run(); err != nil {
 		log.Err(err).Msg("failed to run chatlog instance")
 	}
+
+	log.Info().Msg("rootCmd command has executed")
 }

@@ -177,6 +177,7 @@ func (ds *DataSource) getDBInfosForTimeRange(startTime, endTime time.Time) []Mes
 	return dbs
 }
 
+// 聊天记录
 func (ds *DataSource) GetMessages(ctx context.Context, startTime, endTime time.Time, talker string, sender string, keyword string, limit, offset int) ([]*model.Message, error) {
 	if talker == "" {
 		return nil, errors.ErrTalkerEmpty
@@ -361,18 +362,18 @@ func (ds *DataSource) GetMessages(ctx context.Context, startTime, endTime time.T
 
 // 联系人
 func (ds *DataSource) GetContacts(ctx context.Context, key string, limit, offset int) ([]*model.Contact, error) {
+	// 基础查询语句
+	baseQuery := `SELECT username, local_type, alias, remark, nick_name, verify_flag, flag FROM contact`
 	var query string
 	var args []interface{}
 
 	if key != "" {
 		// 按照关键字查询
-		query = `SELECT username, local_type, alias, remark, nick_name 
-				FROM contact 
-				WHERE username = ? OR alias = ? OR remark = ? OR nick_name = ?`
+		query = baseQuery + ` WHERE username = ? OR alias = ? OR remark = ? OR nick_name = ?`
 		args = []interface{}{key, key, key, key}
 	} else {
 		// 查询所有联系人
-		query = `SELECT username, local_type, alias, remark, nick_name FROM contact`
+		query = baseQuery
 	}
 
 	// 添加排序、分页
@@ -404,6 +405,8 @@ func (ds *DataSource) GetContacts(ctx context.Context, key string, limit, offset
 			&contactV4.Alias,
 			&contactV4.Remark,
 			&contactV4.NickName,
+			&contactV4.VerifyFlag,
+			&contactV4.Flag,
 		)
 
 		if err != nil {
@@ -536,23 +539,34 @@ func (ds *DataSource) GetChatRooms(ctx context.Context, key string, limit, offse
 }
 
 // 最近会话
-func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset int) ([]*model.Session, error) {
+func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset int, HasUnreadCount int) ([]*model.Session, error) {
 	var query string
 	var args []interface{}
 
+	// 基础查询字段
+	baseQuery := `SELECT username, summary, last_timestamp, last_msg_sender, last_sender_display_name, unread_count 
+				FROM SessionTable`
+
+	// 构建WHERE条件
+	var conditions []string
+
+	// 关键字查询条件
 	if key != "" {
-		// 按照关键字查询
-		query = `SELECT username, summary, last_timestamp, last_msg_sender, last_sender_display_name 
-				FROM SessionTable 
-				WHERE username = ? OR last_sender_display_name = ?
-				ORDER BY sort_timestamp DESC`
-		args = []interface{}{key, key}
-	} else {
-		// 查询所有会话
-		query = `SELECT username, summary, last_timestamp, last_msg_sender, last_sender_display_name 
-				FROM SessionTable 
-				ORDER BY sort_timestamp DESC`
+		conditions = append(conditions, "(username = ? OR last_sender_display_name = ?)")
+		args = append(args, key, key)
 	}
+
+	// 未读消息筛选条件
+	if HasUnreadCount > 0 {
+		conditions = append(conditions, "unread_count > 0")
+	}
+
+	// 组合查询语句
+	query = baseQuery
+	if len(conditions) > 0 {
+		query += " WHERE " + strings.Join(conditions, " AND ")
+	}
+	query += " ORDER BY sort_timestamp DESC"
 
 	// 添加分页
 	if limit > 0 {
@@ -582,6 +596,7 @@ func (ds *DataSource) GetSessions(ctx context.Context, key string, limit, offset
 			&sessionV4.LastTimestamp,
 			&sessionV4.LastMsgSender,
 			&sessionV4.LastSenderDisplayName,
+			&sessionV4.UnreadCount,
 		)
 
 		if err != nil {

@@ -65,6 +65,9 @@ func New(configPath string) (*Manager, error) {
 func (m *Manager) Run() error {
 
 	m.ctx.WeChatInstances = m.wechat.GetWeChatInstances()
+
+	log.Info().Msgf("WeChatInstances cnt %d", len(m.ctx.WeChatInstances))
+
 	if len(m.ctx.WeChatInstances) >= 1 {
 		m.ctx.SwitchCurrent(m.ctx.WeChatInstances[0])
 	}
@@ -251,7 +254,7 @@ func (m *Manager) RefreshSession() error {
 			return err
 		}
 	}
-	resp, err := m.db.GetSessions("", 1, 0)
+	resp, err := m.db.GetSessions("", 1, 0, 0)
 	if err != nil {
 		return err
 	}

@@ -138,7 +138,7 @@ func (s *Service) toolsCall(session *mcp.Session, req *mcp.Request) error {
 		}
 		limit := util.MustAnyToInt(callReq.Arguments["limit"])
 		offset := util.MustAnyToInt(callReq.Arguments["offset"])
-		list, err := s.db.GetContacts(keyword, limit, offset)
+		list, err := s.db.GetContacts(keyword, limit, offset, 0)
 		if err != nil {
 			return fmt.Errorf("无法获取联系人列表: %v", err)
 		}
@@ -168,7 +168,7 @@ func (s *Service) toolsCall(session *mcp.Session, req *mcp.Request) error {
 		}
 		limit := util.MustAnyToInt(callReq.Arguments["limit"])
 		offset := util.MustAnyToInt(callReq.Arguments["offset"])
-		data, err := s.db.GetSessions(keyword, limit, offset)
+		data, err := s.db.GetSessions(keyword, limit, offset, 0)
 		if err != nil {
 			return fmt.Errorf("无法获取会话列表: %v", err)
 		}
@@ -243,7 +243,7 @@ func (s *Service) resourcesRead(session *mcp.Session, req *mcp.Request) error {
 	buf := &bytes.Buffer{}
 	switch u.Scheme {
 	case "contact":
-		list, err := s.db.GetContacts(u.Host, 0, 0)
+		list, err := s.db.GetContacts(u.Host, 0, 0, 0)
 		if err != nil {
 			return fmt.Errorf("无法获取联系人列表: %v", err)
 		}
@@ -261,7 +261,7 @@ func (s *Service) resourcesRead(session *mcp.Session, req *mcp.Request) error {
 			buf.WriteString(fmt.Sprintf("%s,%s,%s,%s,%d\n", chatRoom.Name, chatRoom.Remark, chatRoom.NickName, chatRoom.Owner, len(chatRoom.Users)))
 		}
 	case "session":
-		data, err := s.db.GetSessions("", 0, 0)
+		data, err := s.db.GetSessions("", 0, 0, 0)
 		if err != nil {
 			return fmt.Errorf("无法获取会话列表: %v", err)
 		}

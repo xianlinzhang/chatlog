@@ -73,10 +73,10 @@ type GetContactsResp struct {
 	Items []*model.Contact `json:"items"`
 }
 
-func (w *DB) GetContacts(key string, limit, offset int) (*GetContactsResp, error) {
+func (w *DB) GetContacts(key string, limit, offset int, isFriend int) (*GetContactsResp, error) {
 	ctx := context.Background()
 
-	contacts, err := w.repo.GetContacts(ctx, key, limit, offset)
+	contacts, err := w.repo.GetContacts(ctx, key, limit, offset, isFriend)
 	if err != nil {
 		return nil, err
 	}
@@ -107,11 +107,11 @@ type GetSessionsResp struct {
 	Items []*model.Session `json:"items"`
 }
 
-func (w *DB) GetSessions(key string, limit, offset int) (*GetSessionsResp, error) {
+func (w *DB) GetSessions(key string, limit, offset int, HasUnreadCount int) (*GetSessionsResp, error) {
 	ctx := context.Background()
 
 	// 使用 repository 获取会话列表
-	sessions, err := w.repo.GetSessions(ctx, key, limit, offset)
+	sessions, err := w.repo.GetSessions(ctx, key, limit, offset, HasUnreadCount)
 	if err != nil {
 		return nil, err
 	}
