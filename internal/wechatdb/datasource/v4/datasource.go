@@ -255,7 +255,7 @@ func (ds *DataSource) GetMessages(ctx context.Context, startTime, endTime time.T
 				FROM %s m
 				LEFT JOIN Name2Id n ON m.real_sender_id = n.rowid
 				WHERE %s 
-				ORDER BY m.sort_seq ASC
+				ORDER BY m.sort_seq Desc
 			`, tableName, strings.Join(conditions, " AND "))
 
 			// 执行查询
@@ -322,7 +322,7 @@ func (ds *DataSource) GetMessages(ctx context.Context, startTime, endTime time.T
 
 					// 对所有消息按时间排序
 					sort.Slice(filteredMessages, func(i, j int) bool {
-						return filteredMessages[i].Seq < filteredMessages[j].Seq
+						return filteredMessages[i].Seq > filteredMessages[j].Seq
 					})
 
 					// 处理分页
@@ -342,7 +342,7 @@ func (ds *DataSource) GetMessages(ctx context.Context, startTime, endTime time.T
 
 	// 对所有消息按时间排序
 	sort.Slice(filteredMessages, func(i, j int) bool {
-		return filteredMessages[i].Seq < filteredMessages[j].Seq
+		return filteredMessages[i].Seq > filteredMessages[j].Seq
 	})
 
 	// 处理分页
